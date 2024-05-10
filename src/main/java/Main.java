@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
-    public static void main(Integer[] args) {
+    public static void main(String[] args) {
 
 
         int[] initArray = generateArray(10000);

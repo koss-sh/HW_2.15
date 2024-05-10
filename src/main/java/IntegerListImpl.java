@@ -1,10 +1,9 @@
-import java.util.Arrays;
 import java.util.Objects;
 
 public class IntegerListImpl implements IntegerList {
     private final static int DEFAULT_CAPACITY = 10;
 
-    private final Integer[] data;
+    public Integer[] data;
     private int size;
 
     public IntegerListImpl(int capacity) {
@@ -24,12 +23,18 @@ public class IntegerListImpl implements IntegerList {
 
     private void checkSize() {
         if (size == data.length) {
-            throw new IllegalArgumentException("Список полон!");
+            grow();
         }
     }
 
+    private void grow() {
+        Integer[] data = new Integer[(int) (this.data.length * 1.5)];
+        System.arraycopy(this.data, 0, data, 0, this.data.length);
+        this.data = data;
+    }
+
     private void checkIndex(int index) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index > size) {
             throw new IllegalArgumentException("Выход индекса за границы!");
         }
     }
@@ -83,7 +88,7 @@ public class IntegerListImpl implements IntegerList {
     public boolean contains(Integer item) {
         checkItem(item);
         Integer[] copy = toArray();
-        sortInsertion(copy);
+        quickSort(copy, 0, copy.length - 1);
         int min = 0;
         int max = copy.length - 1;
         while (min <= max) {
@@ -100,17 +105,33 @@ public class IntegerListImpl implements IntegerList {
         return false;
     }
 
-    private static void sortInsertion(Integer[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            int temp = arr[i];
-            int j = i;
-            while (j > 0 && arr[j - 1] >= temp) {
-                arr[j] = arr[j - 1];
-                j--;
-            }
-            arr[j] = temp;
+    public static void quickSort(Integer[] arr, int begin, int end) {
+        if (begin < end) {
+            int partitionIndex = partition(arr, begin, end);
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
         }
     }
+
+    private static int partition(Integer[] arr, int begin, int end) {
+        int pivot = arr[end];
+        int i = (begin - 1);
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+                swapitems(arr, i, j);
+            }
+        }
+        swapitems(arr, i + 1, end);
+        return i + 1;
+    }
+
+    private static void swapitems(Integer[] arr, int left, int right) {
+        int temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
+    }
+
 
     @Override
     public int indexOf(Integer item) {
